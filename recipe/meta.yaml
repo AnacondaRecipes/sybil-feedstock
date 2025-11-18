@@ -1,17 +1,17 @@
 {% set name = "sybil" %}
-{% set version = "9.0.0" %}
-{% set sha256 = "0856c253e40d448d6e15d89044ef34c8b5d1f63f685f9371f4bbc9f75f072fa5" %}
+{% set version = "9.2.0" %}
+{% set sha256 = "a7cbccf4b06af7e946a218e23fd59fde36738e91eb698b15619a4d5f97b176bb" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
   sha256: {{ sha256 }}
 
 build:
-  skip: True  # [py<39]
+  skip: true  # [py<39]
   script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
   number: 0
 

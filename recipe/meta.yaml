@@ -1,19 +1,18 @@
 {% set name = "sybil" %}
-{% set version = "9.0.0" %}
-{% set sha256 = "0856c253e40d448d6e15d89044ef34c8b5d1f63f685f9371f4bbc9f75f072fa5" %}
+{% set version = "9.2.0" %}
 
 package:
-  name: {{ name|lower }}
+  name: {{ name }}
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: {{ sha256 }}
+  url: https://github.com/simplistix/{{ name }}/archive/refs/tags/{{ version }}.tar.gz
+  sha256: f872f3df3640eb001ce70432aa9d4a90cf068884b482702bdc10e966765a46e7
 
 build:
-  skip: True  # [py<39]
-  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
   number: 0
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  skip: true  # [py<39]
 
 requirements:
   host:
@@ -24,13 +23,14 @@ requirements:
   run:
     - python
 
+# Tests disabled -> E   ModuleNotFoundError: No module named 'seedir' (not in the main channel) -> https://pypi.org/project/seedir
 test:
   imports:
     - sybil
-  requires:
-    - pip
   commands:
     - pip check
+  requires:
+    - pip
 
 about:
   home: https://github.com/simplistix/sybil
@@ -43,7 +43,7 @@ about:
   license: MIT
   license_file: LICENSE.txt
   license_family: MIT
-  doc_url: https://sybil.readthedocs.io/
+  doc_url: https://sybil.readthedocs.io
   dev_url: https://github.com/simplistix/sybil
 
 extra:

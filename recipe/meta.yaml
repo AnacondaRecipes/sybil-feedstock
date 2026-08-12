@@ -1,5 +1,5 @@
 {% set name = "sybil" %}
-{% set version = "9.2.0" %}
+{% set version = "10.1.0" %}
 
 package:
   name: {{ name }}
@@ -7,30 +7,44 @@ package:
 
 source:
   url: https://github.com/simplistix/{{ name }}/archive/refs/tags/{{ version }}.tar.gz
-  sha256: f872f3df3640eb001ce70432aa9d4a90cf068884b482702bdc10e966765a46e7
+  sha256: 7f6c63ed762584ce55e5fa015f311adaf1a0d86b04973c988aabaea1a6adead6
 
 build:
   number: 0
   script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
-  skip: true  # [py<39]
+  skip: true  # [py<311]
 
 requirements:
   host:
     - python
     - pip
-    - setuptools
-    - wheel
+    - hatchling
   run:
     - python
+  run_constrained:
+    - pyyaml >=6.0.3
 
-# Tests disabled -> E   ModuleNotFoundError: No module named 'seedir' (not in the main channel) -> https://pypi.org/project/seedir
+# Run a focused upstream test subset because most of the tests suite depends
+# on seedir, which is unavailable in the main channel;
+# test_testing.py still provides meaningful coverage of core sybil functionality.
+# And these tests fail on Windows due to platform-specific temporary-file handling and path separators.
+{% set deselect_tests = "" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_testing.py::TestCheckSybil::test_no_matches" %}  # [win]
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_testing.py::TestRunPytest::test_failing_test" %}  # [win]
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_testing.py::TestRunPytest::test_failure_output_immune_to_color_env" %}  # [win]
+
 test:
+  source_files:
+    - tests/test_testing.py
   imports:
     - sybil
   commands:
     - pip check
+    - python -m pytest -v tests/test_testing.py {{ deselect_tests }}
   requires:
     - pip
+    - pytest >=8
+    - testfixtures >=11
 
 about:
   home: https://github.com/simplistix/sybil
